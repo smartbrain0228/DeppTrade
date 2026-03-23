@@ -1,124 +1,202 @@
-# Bot Trading Copilot
+# Trade Execution Engine
 
-## Dépendances
+Trade Execution Engine est un moteur web de decision et d'execution de strategies de trading crypto.
 
-Ce projet utilise deux fichiers :
+Le projet combine:
 
-- `requirements.txt` : la liste logique des dépendances à installer en dev.
-- `requirements.lock.txt` : un lockfile avec les versions figées pour des environnements reproductibles (prod/CI).
+- analyse de strategies multi-timeframes
+- scan de signaux
+- execution et suivi de trades
+- dashboard web operateur
+- notifications Telegram
+- mode demo automatique pour valider rapidement une strategie sans engager de capital
 
-### Installation (dev)
+## Stack
+
+### Backend
+
+- FastAPI
+- SQLAlchemy async
+- Alembic
+- PostgreSQL
+- Redis optionnel
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Zustand
+- lightweight-charts
+
+## Etat actuel
+
+Le projet est deja a un stade MVP fonctionnel en local avec:
+
+- authentification
+- administration et assignments utilisateur / symbole / strategie
+- scan et execution de signaux
+- overlays et historique de signaux
+- suivi de trades
+- notifications Telegram
+- worker de gestion des trades
+- demo engine automatique
+- mode `mock` / `local` pour valider le moteur sans dependre des exchanges
+
+## Installation locale
+
+### 1. Cloner et installer le backend
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### Configuration locale
-
-```powershell
-Copy-Item .env.example .env
-```
-
-### Services locaux (PostgreSQL + Redis)
-
-```powershell
-docker compose up -d
-```
-
-### Installation (reproductible)
+Installation reproductible:
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.lock.txt
 ```
 
-### Mise à jour du lockfile
+### 2. Configurer l'environnement
 
 ```powershell
-.\venv\Scripts\Activate.ps1
-pip freeze > requirements.lock.txt
+Copy-Item .env.example .env
 ```
 
-### Migrations DB (Alembic)
+### 3. Demarrer PostgreSQL et Redis
+
+```powershell
+docker compose up -d
+```
+
+### 4. Appliquer les migrations
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 alembic upgrade head
 ```
 
-### Bootstrap API (admin + seed)
+### 5. Creer l'admin local
 
-Use the request sequence in `docs/mvp_bootstrap.http`.
+```powershell
+.\venv\Scripts\python.exe create_admin.py
+```
+
+### 6. Initialiser les strategies locales
+
+```powershell
+.\venv\Scripts\python.exe setup_multi_strategy.py
+```
+
+## Lancement local
+
+### Backend standard
+
+```powershell
+.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app --reload
+```
+
+### Frontend
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+### Frontend build via backend
+
+```powershell
+cd frontend
+npm run build
+```
+
+Une fois le frontend build, le backend peut servir l'interface directement.
 
 ## Modes d'execution
 
-Le backend a maintenant deux axes de mode:
+Le backend pilote deux axes:
 
-- demarrage des boucles de fond
+- activation des boucles de fond
 - source des donnees marche
 
 Par defaut:
 
-- `APP_ENV=development` ou `test` ne lance pas le worker ni le demo engine
-- `MARKET_DATA_MODE=live` reste le comportement par defaut
+- `APP_ENV=development` ou `test` n'active pas automatiquement le worker ni le demo engine
+- `MARKET_DATA_MODE=live` reste le mode par defaut
 
 Variables utiles:
 
-- `ENABLE_WORKER=true` pour lancer explicitement le worker en local
-- `ENABLE_DEMO_ENGINE=true` pour lancer explicitement le demo engine en local
-- `MARKET_DATA_MODE=mock` ou `MARKET_DATA_MODE=local` pour utiliser des candles deterministes sans appel exchange
+- `ENABLE_WORKER=true`
+- `ENABLE_DEMO_ENGINE=true`
+- `MARKET_DATA_MODE=mock`
+- `MARKET_DATA_MODE=local`
+- `MARKET_DATA_MODE=live`
 
-Exemples de demarrage:
+## Scripts utiles
 
-### Mode local silencieux
-
-```powershell
-$env:APP_ENV="development"
-Remove-Item Env:ENABLE_WORKER -ErrorAction SilentlyContinue
-Remove-Item Env:ENABLE_DEMO_ENGINE -ErrorAction SilentlyContinue
-Remove-Item Env:MARKET_DATA_MODE -ErrorAction SilentlyContinue
-.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app --reload
-```
-
-### Mode local silencieux avec marche mock
+### Demo auto locale sur donnees mock
 
 ```powershell
-$env:APP_ENV="development"
-$env:MARKET_DATA_MODE="mock"
-.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app --reload
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\start_auto_demo_local.ps1
 ```
 
-### Mode local avec worker
+URL:
+
+- `http://127.0.0.1:8002/`
+
+### Demo auto locale sur donnees live
 
 ```powershell
-$env:APP_ENV="development"
-$env:ENABLE_WORKER="true"
-$env:MARKET_DATA_MODE="mock"
-.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app --reload
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\start_auto_demo_live.ps1
 ```
 
-### Mode local avec demo engine
+URL:
+
+- `http://127.0.0.1:8003/`
+
+### Arret des instances auto-demo
 
 ```powershell
-$env:APP_ENV="development"
-$env:ENABLE_DEMO_ENGINE="true"
-$env:MARKET_DATA_MODE="mock"
-.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app --reload
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\stop_auto_demo.ps1
 ```
 
-### Mode production-like
+## Validation
+
+### Backend
 
 ```powershell
-$env:APP_ENV="production"
-$env:MARKET_DATA_MODE="live"
-$env:ENABLE_WORKER="true"
-$env:ENABLE_DEMO_ENGINE="true"
-.\venv\Scripts\python.exe -m uvicorn trading_bot_backend.app.main:app
+.\venv\Scripts\pytest.exe -q
 ```
 
-Notes:
+### Frontend
 
-- `mock` est pratique pour valider `scan`, `execute`, le worker et le demo engine sans connectivite exchange.
-- `live` est le mode a conserver pour une validation proche de la production.
-- le frontend consomme les memes routes; le switch se fait cote backend uniquement.
+```powershell
+cd frontend
+npm run build
+```
+
+## Documentation utile
+
+- [Etat courant](docs/CURRENT_STATE.md)
+- [Tache courante](docs/CURRENT_TASK.md)
+- [Contexte IA](docs/AI_CONTEXT.md)
+- [Architecture](docs/PROJECT_ARCHITECTURE.md)
+- [Resume de reprise](docs/RESUME_FOR_NEXT_CHAT.md)
+
+## Deploiement demo
+
+Le prochain objectif recommande pour une validation plus stable est un deploiement en ligne en mode demo automatique.
+
+Voir:
+
+- [Runbook de deploiement demo](docs/DEPLOYMENT_DEMO.md)
+
+## Securite
+
+- ne jamais versionner `.env`
+- ne jamais pousser de cles API ou secrets Telegram
+- utiliser `.env.example` comme modele public
+
