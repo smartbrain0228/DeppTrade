@@ -1,0 +1,48 @@
+# Framework Web & Serveur
+fastapi
+uvicorn[standard]
+gunicorn
+sqladmin
+itsdangerous
+
+# Base de données & ORM
+sqlalchemy
+alembic
+asyncpg
+psycopg2-binary
+
+# Validation & Configuration
+pydantic
+pydantic-settings
+python-dotenv
+email-validator
+
+# Authentification & Sécurité
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Trading & Intégrations Exchanges (Binance, MEXC)
+ccxt
+httpx
+python-binance
+
+# Analyse Technique & Données (Stratégies)
+pandas
+numpy
+pandas-ta
+
+# Notifications
+python-telegram-bot
+
+# Cache & Temps réel
+redis
+websockets
+
+# Logging & Utilitaires
+loguru
+tenacity
+
+# Tests
+pytest
+pytest-asyncio

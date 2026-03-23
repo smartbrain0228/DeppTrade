@@ -1,0 +1,49 @@
+### 1) Bootstrap first admin (development only)
+POST http://127.0.0.1:8000/auth/bootstrap-admin
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "username": "admin",
+  "password": "AdminPass123!"
+}
+
+### 2) Login as admin (OAuth2 form)
+POST http://127.0.0.1:8000/auth/login
+Content-Type: application/x-www-form-urlencoded
+
+username=admin&password=AdminPass123!
+
+### 3) Seed default strategies/symbols
+POST http://127.0.0.1:8000/admin-api/seed
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+
+### 4) List strategies
+GET http://127.0.0.1:8000/admin-api/strategies
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+
+### 5) List symbols
+GET http://127.0.0.1:8000/admin-api/symbols
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+
+### 6) Scan an assignment and persist its signal snapshot
+POST http://127.0.0.1:8000/signals/assignments/1/scan
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+Content-Type: application/json
+
+{
+  "htf_limit": 120,
+  "ltf_limit": 240
+}
+
+### 7) List persisted signal history for an assignment with pagination/date filters
+GET http://127.0.0.1:8000/signals/assignments/1/history?offset=0&limit=20&created_from=2026-03-10T00:00:00Z&created_to=2026-03-12T23:59:59Z
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+
+### 8) Get frontend-ready overlay payload for an assignment
+GET http://127.0.0.1:8000/signals/assignments/1/overlay?offset=0&limit=20&created_from=2026-03-10T00:00:00Z&created_to=2026-03-12T23:59:59Z
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
+
+### 9) Admin list of signal events with filters and pagination
+GET http://127.0.0.1:8000/admin-api/signal-events?symbol_id=1&strategy_id=1&signal_status=READY&trigger=EXECUTE&offset=0&limit=50&created_from=2026-03-10T00:00:00Z&created_to=2026-03-12T23:59:59Z
+Authorization: Bearer <PASTE_ACCESS_TOKEN_HERE>
