@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/trading_bot
+      - DATABASE_URL=postgresql+asyncpg://app_user:app_password@postgres:5432/trading_bot
       - REDIS_URL=redis://redis:6379/0
     volumes:
       - .:/app
@@ -19,8 +19,8 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: trading_bot
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
     ports:
       - "5432:5432"
     volumes:

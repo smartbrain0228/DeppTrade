@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     market_data_mock_seed: int = Field(default=20260321, alias="MARKET_DATA_MOCK_SEED")
 
     database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/trading_bot",
+        default="postgresql+asyncpg://app_user:app_password@localhost:5432/trading_bot",
         alias="DATABASE_URL",
     )
     db_pool_size: int = Field(default=20, alias="DB_POOL_SIZE")
