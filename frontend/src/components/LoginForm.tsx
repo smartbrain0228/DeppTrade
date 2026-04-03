@@ -20,7 +20,7 @@ const LoginForm = ({ isLoading, error, onSubmit }: LoginFormProps) => {
       <div className="auth-stage" />
       <div className="auth-card">
         <div className="auth-card__intro mb-4">
-          <div className="auth-card__eyebrow">Bot Trading Copilot</div>
+          <div className="auth-card__eyebrow">Market Operations Console</div>
           <h1 className="h3 fw-bold mb-2">Connexion</h1>
           <p className="text-muted mb-0">
             Connecte-toi pour charger tes assignments, tes signaux et les overlays du chart.

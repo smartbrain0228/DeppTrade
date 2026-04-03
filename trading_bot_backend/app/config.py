@@ -12,7 +12,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    app_name: str = "Bot Trading Copilot"
+    app_name: str = "Market Operations Console"
     app_env: str = Field(default="development", alias="APP_ENV")
     enable_worker: bool | None = Field(default=None, alias="ENABLE_WORKER")
     enable_demo_engine: bool | None = Field(default=None, alias="ENABLE_DEMO_ENGINE")
@@ -28,7 +28,9 @@ class Settings(BaseSettings):
     db_pool_timeout: int = Field(default=30, alias="DB_POOL_TIMEOUT")
     db_pool_recycle: int = Field(default=1800, alias="DB_POOL_RECYCLE")
 
-    jwt_secret_key: str = Field(default="change-me", alias="JWT_SECRET_KEY")
+    jwt_secret_key: str = Field(
+        default="set-a-long-random-jwt-secret", alias="JWT_SECRET_KEY"
+    )
     jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(
         default=30, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
@@ -42,9 +44,12 @@ class Settings(BaseSettings):
     mexc_api_key: str = Field(default="", alias="MEXC_API_KEY")
     mexc_api_secret: str = Field(default="", alias="MEXC_API_SECRET")
     admin_username: str = Field(default="admin", alias="ADMIN_USERNAME")
-    admin_password: str = Field(default="admin123", alias="ADMIN_PASSWORD")
+    admin_password: str = Field(
+        default="set-a-strong-admin-password", alias="ADMIN_PASSWORD"
+    )
     admin_session_secret: str = Field(
-        default="change-admin-session-secret", alias="ADMIN_SESSION_SECRET"
+        default="set-a-long-random-admin-session-secret",
+        alias="ADMIN_SESSION_SECRET",
     )
 
     telegram_bot_token: str = Field(default="", alias="TELEGRAM_BOT_TOKEN")

@@ -43,12 +43,12 @@ ENABLE_WORKER=true
 ENABLE_DEMO_ENGINE=true
 MARKET_DATA_MODE=live
 
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/trading_bot
+DATABASE_URL=postgresql+asyncpg://app_user:app_password@postgres:5432/trading_bot
 REDIS_URL=redis://redis:6379/0
 
-JWT_SECRET_KEY=replace-me
-ADMIN_PASSWORD=replace-me
-ADMIN_SESSION_SECRET=replace-me
+JWT_SECRET_KEY=set-a-long-random-jwt-secret
+ADMIN_PASSWORD=set-a-strong-admin-password
+ADMIN_SESSION_SECRET=set-a-long-random-admin-session-secret
 
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
@@ -60,7 +60,7 @@ TELEGRAM_CHAT_ID=
 
 ```bash
 git clone <repo-url>
-cd trade-execution-engine
+cd <private-repo-directory>
 ```
 
 ### 2. Creer `.env`

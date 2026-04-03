@@ -84,5 +84,5 @@ if os.path.exists(frontend_path):
 else:
     @app.get("/")
     def read_root():
-        return {"message": "Bot Trading Copilot backend is running (Frontend not built)"}
+        return {"message": f"{settings.app_name} backend is running (Frontend not built)"}
     logger.warning("Frontend 'dist' folder not found. Run 'npm run build' in frontend directory to serve it via backend.")

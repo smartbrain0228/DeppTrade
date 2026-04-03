@@ -1,6 +1,6 @@
-# Trade Execution Engine
+# Market Operations Console
 
-Trade Execution Engine est un moteur web de decision et d'execution de strategies de trading crypto.
+Market Operations Console est une console web de supervision, d'analyse et d'execution de strategies de trading crypto.
 
 Le projet combine:
 
@@ -199,4 +199,3 @@ Voir:
 - ne jamais versionner `.env`
 - ne jamais pousser de cles API ou secrets Telegram
 - utiliser `.env.example` comme modele public
-

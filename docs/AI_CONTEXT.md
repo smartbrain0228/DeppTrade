@@ -4,17 +4,16 @@ This file is intended to help a new AI assistant resume work quickly and accurat
 
 ## Project Goal
 
-Build a web-based crypto trading copilot with:
+Build a web-based crypto trading system focused on:
 
-- user authentication
-- exchange-backed market data
-- strategy analysis and trade signals
-- trade execution and monitoring
+- strategy analysis
+- signal validation
+- demo trade execution and monitoring
 - operator-facing dashboard UX
-- admin bootstrap and configuration flows
-- Telegram notifications for operational events
+- Telegram notifications
+- automated strategy observation in demo mode
 
-The system supports both manual operator flows and automated demo-trading background logic.
+The project started as a local MVP and is now moving toward a cleaner private product codebase.
 
 ## Stack
 
@@ -34,9 +33,8 @@ The system supports both manual operator flows and automated demo-trading backgr
 - TypeScript
 - Vite
 - Zustand
-- Bootstrap utilities plus custom CSS redesign
+- custom CSS redesign
 - lightweight-charts
-- websocket updates
 
 ## Current Product Shape
 
@@ -52,29 +50,37 @@ The app already supports a real local MVP flow:
 8. refresh overview / trades / overlay
 9. observe Telegram notifications for trading events
 
+It also supports auto-demo behavior when enabled:
+
+- demo engine scans active assignments
+- worker manages open trades
+- runtime state is exposed in the UI
+
 ## What Was Recently Fixed
 
-An assistant continuing this project should assume these are already done:
+Assume these are already done:
 
 - tests run cleanly from repo root
 - frontend build compiles
-- startup moved to lifespan
+- startup uses lifespan
 - worker/demo engine no longer auto-start in dev/test unless explicitly enabled
-- backend market data now supports deterministic mock/local mode
-- Telegram integration was aligned with assignment-level balances
-- local `.env` handling is safer and root `.gitignore` now protects secrets
-- Telegram local test script was corrected
-- frontend received a strong visual redesign
-- watchlist layout was improved to avoid overlapping cards
-- frontend supports switching between multiple strategies for the same symbol
-- schema now allows multi-strategy assignments on the same user/symbol pair
+- backend market data supports deterministic mock/local mode
+- demo engine assignment payload bug was fixed
+- Telegram failure logging is less noisy
+- UI exposes runtime state
+- admin monitor separates strategy results more clearly
+- local auto-demo PowerShell scripts were added
+- Git repo was initialized locally
+- project was pushed to the current GitHub repo once
+- a quick privacy audit was completed
 
 ## Current Risks / Constraints
 
-- live market data still requires network access when `MARKET_DATA_MODE=live`
-- local multi-strategy bootstrap is improved, but setup scripts still need cleanup for perfect repeatability
-- responsive frontend quality is better than before, but not fully finished
-- deployment/runbook docs are still not comprehensive
+- live market mode still depends on exchange/network access
+- deployment is not yet fully hardened
+- old project identity still appears in code/docs/UI
+- current `origin` still points to the old GitHub repo
+- next work should avoid leaking continuity unnecessarily before migration to the new private repo
 
 ## Files That Matter Most
 
@@ -83,31 +89,31 @@ An assistant continuing this project should assume these are already done:
 - `trading_bot_backend/app/models.py`
 - `trading_bot_backend/app/routes/`
 - `trading_bot_backend/app/services/`
-- `frontend/src/pages/Home.tsx`
 - `frontend/src/components/`
+- `frontend/src/pages/Home.tsx`
 - `frontend/src/services/api.ts`
-- `frontend/src/store/useTradingStore.ts`
 - `docs/CURRENT_STATE.md`
 - `docs/CURRENT_TASK.md`
+- `docs/RESUME_FOR_NEXT_CHAT.md`
 
 ## Important Local Facts
 
 - backend local URL: `http://127.0.0.1:8000/`
-- separate frontend dev URL, if running: `http://127.0.0.1:4173/`
-- Telegram credentials are expected in `.env`
+- frontend dev URL: `http://127.0.0.1:4173/`
+- auto-demo mock script targets port `8002`
+- auto-demo live script targets port `8003`
 - current local admin data includes BTC assignments for:
   - `SMC_H4_M15`
   - `SMC_H1_M5`
 
 ## Resume Guidance
 
-If starting a new conversation, do not assume the project is an early scaffold.
+If starting a new conversation, do not assume the next priority is feature work.
 
 Assume instead:
 
 - the local baseline is functional
 - tests/builds are green
-- the frontend has already been visually redesigned
-- Telegram is already integrated
-- the system now supports multiple strategies per symbol
-- the remaining work is mainly setup hardening, responsive polish, observability, docs, and deeper operational robustness
+- Git and GitHub preparation has already started
+- the next priority is repository/privacy migration
+- the immediate job is to rename/reposition locally, then switch to the new private GitHub repo

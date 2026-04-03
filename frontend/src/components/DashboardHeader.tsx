@@ -11,7 +11,7 @@ const DashboardHeader = ({ username, headerLabel, authError, onLogout }: Dashboa
       <div className="dashboard-hero mb-4">
         <div className="dashboard-hero__content">
           <div className="dashboard-hero__eyebrow">Trading cockpit</div>
-          <h1 className="dashboard-hero__title">Bot Trading Copilot</h1>
+          <h1 className="dashboard-hero__title">Market Operations Console</h1>
           <p className="dashboard-hero__subtitle">{headerLabel}</p>
         </div>
         <div className="dashboard-hero__actions">

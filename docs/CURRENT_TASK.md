@@ -2,80 +2,70 @@
 
 ## Immediate Objective
 
-Move from "working local MVP" to "clean handoff state with better frontend polish and stable multi-strategy local behavior".
+Prepare the codebase for migration from the current GitHub repo to a new private GitHub repo with reduced continuity to the old public-facing identity.
 
 ## What Is Already Done
 
-- backend auth/admin/assignment/trade/signal flows exist
-- signal persistence and overlay generation exist
-- frontend dashboard is connected to the backend
-- root backend tests pass
-- frontend production build passes
-- Telegram integration works locally when configured through `.env`
-- local secrets handling is safer than before
-- startup now uses lifespan instead of deprecated startup events
-- worker/demo engine autostart is gated by config
-- backend market data supports deterministic `mock` / `local` mode
-- frontend has received a significant visual redesign
-- watchlist and assignment UX now better support multi-strategy scenarios
-- schema now allows multiple strategies for the same user + symbol
-- local admin data now includes both BTC setups:
-  - `H4/M15`
-  - `H1/M5`
+- local Git repo initialized
+- `main` branch created
+- initial commit created
+- README improved
+- demo deployment runbook added
+- current repo pushed once to the existing GitHub repo
+- quick privacy audit completed
 
 ## Effective Current State
 
-As of 2026-03-22:
+As of 2026-04-03:
 
-- backend tests pass: `44 passed`
+- backend tests pass: `48 passed`
 - frontend build passes
-- backend root serves the built frontend locally
-- Telegram notifications are wired and testable
-- multi-strategy assignments are now supported in schema and local data
-- frontend displays a much better UI baseline than before
+- local repo is clean
+- current `origin` still points to the old GitHub repo
+- audit found no tracked real secrets
+- audit did find older branding / naming that should be replaced before migration
 
 ## Main Remaining Work
 
 The most useful next work is now:
 
-1. make local multi-strategy bootstrap/setup fully repeatable
-2. continue responsive UX polish
-3. improve deployment/runbook documentation
-4. increase observability around runtime mode and background services
-5. strengthen tests for multi-strategy and admin assignment behavior
+1. choose the new project/product name
+2. replace old public-facing labels in:
+   - docs
+   - frontend UI
+   - backend app name / messages
+3. decide whether default/example credential strings should be tightened
+4. switch `origin` to the new private GitHub repo
+5. push the cleaned version
 
 ## Recommended Order
 
-1. clean up and harden local setup scripts for admin + strategies
-2. finish responsive polish in the frontend
-3. document a clean local startup and validation runbook
-4. add tests specifically for multi-strategy assignments and related API behavior
+1. rename visible identity in code/docs/UI
+2. re-check privacy-sensitive strings
+3. update Git remote
+4. push to the new private repo
+5. then continue with deployment planning
 
 ## Constraints
 
-- keep routes thin
-- keep business logic in services
-- do not move strategy logic into the frontend
-- preserve current API contracts unless intentionally versioned
-- avoid destructive schema changes unless explicitly requested
 - do not expose secrets in docs, code, or chats
+- avoid unnecessary destructive Git operations
+- preserve working functionality while renaming project identity
+- keep route/service architecture intact
 
 ## Useful Commands
 
 ```powershell
-docker compose up -d
-venv\Scripts\python.exe -m alembic upgrade head
-venv\Scripts\pytest.exe -q
+git remote -v
+git status --short
+git log --oneline -5
 
-venv\Scripts\python.exe create_admin.py
-venv\Scripts\python.exe setup_multi_strategy.py
-
-cd frontend
-npm run build
+git remote set-url origin <NEW_PRIVATE_REPO_URL>
+git push -u origin main
 ```
 
 ## Resume Hint For Next Conversation
 
 Use this summary:
 
-"The project is a working local crypto trading copilot MVP with a FastAPI backend and redesigned React frontend. Auth, admin flows, assignments, scan/execute, overlays, trades, Telegram notifications, worker/demo-engine gating, and mock/local market-data mode all exist. Backend tests pass, frontend build passes, the backend serves the built frontend locally, Telegram works when configured in `.env`, and the schema now supports multiple strategies on the same symbol. The local admin currently has BTC assignments for both `SMC_H4_M15` and `SMC_H1_M5`. The next recommended work is to harden repeatable local setup, polish responsive UI, improve runbook/deployment docs, and add tests around multi-strategy behavior." 
+"The project is a working local crypto trading MVP with FastAPI, React/Vite, PostgreSQL, Telegram integration, multi-strategy assignments, and auto-demo support. Tests and frontend build are green. A local Git repo was initialized and pushed once to the old GitHub repo, but a privacy/identity audit showed that legacy public branding still appears in code/docs/UI. No real secrets were found in tracked files. The immediate next step is to rename/reposition the project locally, then switch `origin` to the new private GitHub repo and push only the cleaned version."
