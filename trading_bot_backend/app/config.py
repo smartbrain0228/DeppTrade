@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development", alias="APP_ENV")
     enable_worker: bool | None = Field(default=None, alias="ENABLE_WORKER")
     enable_demo_engine: bool | None = Field(default=None, alias="ENABLE_DEMO_ENGINE")
+    bootstrap_schema_on_startup: bool = Field(
+        default=False, alias="BOOTSTRAP_SCHEMA_ON_STARTUP"
+    )
+    bootstrap_admin_on_startup: bool = Field(
+        default=False, alias="BOOTSTRAP_ADMIN_ON_STARTUP"
+    )
     market_data_mode: str = Field(default="live", alias="MARKET_DATA_MODE")
     market_data_mock_seed: int = Field(default=20260321, alias="MARKET_DATA_MOCK_SEED")
 
