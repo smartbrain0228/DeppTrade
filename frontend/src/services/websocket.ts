@@ -5,13 +5,26 @@ type CandleCallback = (candles: Candle[]) => void;
 class WebsocketService {
   private socket: WebSocket | null = null;
 
+  private getWebsocketUrl(): string {
+    if (import.meta.env.VITE_WS_URL) {
+      return import.meta.env.VITE_WS_URL;
+    }
+
+    if (typeof window !== "undefined") {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      return `${protocol}//${window.location.host}/ws`;
+    }
+
+    return "ws://localhost:8000/ws";
+  }
+
   private ensureOpen(): Promise<void> {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       return Promise.resolve();
     }
 
     return new Promise((resolve, reject) => {
-      const url = import.meta.env.VITE_WS_URL ?? "ws://localhost:8000/ws";
+      const url = this.getWebsocketUrl();
       console.log("Connecting to WebSocket:", url);
       this.socket = new WebSocket(url);
 
