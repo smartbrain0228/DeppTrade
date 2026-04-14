@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import math
 from functools import lru_cache
 
@@ -11,6 +12,8 @@ from fastapi import HTTPException, status
 from trading_bot_backend.app.config import settings
 from trading_bot_backend.app.models import StrategyNameEnum
 from trading_bot_backend.app.services.strategy import get_strategy_spec
+
+logger = logging.getLogger(__name__)
 
 TIMEFRAME_TO_BINANCE_INTERVAL = {
     "M1": Client.KLINE_INTERVAL_1MINUTE,
@@ -103,6 +106,38 @@ def _normalize_symbol_for_ccxt(symbol: str) -> str:
 
 def _normalize_symbol_for_binance(symbol: str) -> str:
     return _normalize_symbol_for_ccxt(symbol).replace("/", "")
+
+
+def _format_ohlcv(klines: list[list | tuple]) -> list[dict]:
+    return [
+        {
+            "time": int(kline[0] / 1000),
+            "open": float(kline[1]),
+            "high": float(kline[2]),
+            "low": float(kline[3]),
+            "close": float(kline[4]),
+            "volume": float(kline[5]),
+        }
+        for kline in klines
+    ]
+
+
+def _should_fallback_from_binance(exc: Exception) -> bool:
+    message = str(exc).lower()
+    return (
+        "restricted location" in message
+        or "service unavailable from a restricted location" in message
+        or "eligibility" in message
+    )
+
+
+def _fetch_mexc_candles(*, symbol: str, timeframe: str, limit: int) -> list[dict]:
+    klines = _mexc_client.fetch_ohlcv(
+        _normalize_symbol_for_ccxt(symbol),
+        timeframe=TIMEFRAME_TO_CCXT_INTERVAL[timeframe],
+        limit=limit,
+    )
+    return _format_ohlcv(klines)
 
 
 def _seed_from_parts(*parts: object) -> int:
@@ -358,47 +393,42 @@ def fetch_candles(
             symbol_str = _normalize_symbol_for_binance(symbol)
             interval = TIMEFRAME_TO_BINANCE_INTERVAL[timeframe]
 
-            if is_futures:
-                klines = client.futures_klines(
-                    symbol=symbol_str,
-                    interval=interval,
+            try:
+                if is_futures:
+                    klines = client.futures_klines(
+                        symbol=symbol_str,
+                        interval=interval,
+                        limit=limit,
+                    )
+                else:
+                    klines = client.get_klines(
+                        symbol=symbol_str,
+                        interval=interval,
+                        limit=limit,
+                    )
+                return _format_ohlcv(klines)
+            except Exception as exc:
+                if not _should_fallback_from_binance(exc):
+                    raise
+
+                logger.warning(
+                    "Binance market data unavailable for %s %s on %s; falling back to MEXC.",
+                    symbol,
+                    timeframe,
+                    exchange,
+                )
+                return _fetch_mexc_candles(
+                    symbol=symbol,
+                    timeframe=timeframe,
                     limit=limit,
                 )
-            else:
-                klines = client.get_klines(
-                    symbol=symbol_str,
-                    interval=interval,
-                    limit=limit,
-                )
-            return [
-                {
-                    "time": int(kline[0] / 1000),
-                    "open": float(kline[1]),
-                    "high": float(kline[2]),
-                    "low": float(kline[3]),
-                    "close": float(kline[4]),
-                    "volume": float(kline[5]),
-                }
-                for kline in klines
-            ]
 
         if exchange == "mexc":
-            klines = _mexc_client.fetch_ohlcv(
-                _normalize_symbol_for_ccxt(symbol),
-                timeframe=TIMEFRAME_TO_CCXT_INTERVAL[timeframe],
+            return _fetch_mexc_candles(
+                symbol=symbol,
+                timeframe=timeframe,
                 limit=limit,
             )
-            return [
-                {
-                    "time": int(kline[0] / 1000),
-                    "open": float(kline[1]),
-                    "high": float(kline[2]),
-                    "low": float(kline[3]),
-                    "close": float(kline[4]),
-                    "volume": float(kline[5]),
-                }
-                for kline in klines
-            ]
     except HTTPException:
         raise
     except Exception as exc:
