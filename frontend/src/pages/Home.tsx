@@ -62,8 +62,9 @@ const Home = () => {
 
   const lastCandle = candles[candles.length - 1];
   const firstCandle = candles[0];
-  const price = lastCandle?.close ?? 0;
-  const change = firstCandle ? ((price - firstCandle.open) / firstCandle.open) * 100 : 0;
+  const price = lastCandle?.close ?? null;
+  const change =
+    firstCandle && lastCandle ? ((lastCandle.close - firstCandle.open) / firstCandle.open) * 100 : null;
   const selectedAssignment = assignments.find((assignment) => assignment.id === selectedAssignmentId) ?? null;
 
   if (accessToken && currentUser === null && isBootstrappingSession) {
@@ -101,6 +102,7 @@ const Home = () => {
               selectedAssignmentId={selectedAssignmentId}
               selectedAssignment={selectedAssignment}
               assignmentsCount={assignments.length}
+              candles={candles}
               price={price}
               change={change}
               isLoading={isLoading}

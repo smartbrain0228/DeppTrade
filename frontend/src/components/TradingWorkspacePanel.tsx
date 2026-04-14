@@ -15,8 +15,9 @@ interface TradingWorkspacePanelProps {
   selectedAssignmentId: number | null;
   selectedAssignment: PairStrategyAssignment | null;
   assignmentsCount: number;
-  price: number;
-  change: number;
+  candles: Array<{ time: number }>;
+  price: number | null;
+  change: number | null;
   isLoading: boolean;
   error: string | null;
   overlayError: string | null;
@@ -42,6 +43,7 @@ const TradingWorkspacePanel = ({
   selectedAssignmentId,
   selectedAssignment,
   assignmentsCount,
+  candles,
   price,
   change,
   isLoading,
@@ -84,9 +86,15 @@ const TradingWorkspacePanel = ({
           )}
         </div>
         <div className="workspace-price text-end">
-          <div className="workspace-price__value">${formatPrice(price)}</div>
-          <small className={change >= 0 ? "workspace-price__delta is-up" : "workspace-price__delta is-down"}>
-            {formatPercent(change)}
+          <div className="workspace-price__value">
+            {price === null ? "Prix indisponible" : `$${formatPrice(price)}`}
+          </div>
+          <small
+            className={
+              change === null ? "workspace-price__delta" : change >= 0 ? "workspace-price__delta is-up" : "workspace-price__delta is-down"
+            }
+          >
+            {change === null ? "En attente du flux marche" : formatPercent(change)}
           </small>
         </div>
       </div>
@@ -122,6 +130,11 @@ const TradingWorkspacePanel = ({
       )}
 
       <Chart />
+      {candles.length === 0 && !isLoading && (
+        <div className="alert alert-secondary py-2 mt-3 dashboard-alert">
+          Aucune bougie live disponible pour le moment. Le graphe n'affiche pas de donnees de substitution.
+        </div>
+      )}
       <SignalActionPanel
         isBusy={isSignalBusy}
         error={signalError}

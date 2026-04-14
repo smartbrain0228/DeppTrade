@@ -12,7 +12,6 @@ import {
 import { websocketService } from "../../services/websocket";
 import { useTradingStore } from "../../store/useTradingStore";
 import { OverlayItem, SignalAnalysisResponse } from "../../types/trading";
-import { generateCandles } from "../../utils/format";
 import { POLLING_INTERVAL_MS, RefreshOptions, getErrorMessage } from "./shared";
 
 interface TradingDashboardDataOptions {
@@ -348,11 +347,8 @@ export const useTradingDashboardData = ({
           return;
         }
         if (isMounted) {
-          setError("Impossible de charger les donnees. Affichage des donnees locales.");
-          // On ne génère des bougies que si on n'en a pas déjà
-          if (candles.length === 0) {
-            setCandles(generateCandles(500));
-          }
+          setCandles([]);
+          setError("Impossible de charger les donnees live du marche.");
         }
       } finally {
         if (isMounted) {
@@ -376,6 +372,7 @@ export const useTradingDashboardData = ({
       .subscribeCandles(exchange, selectedCrypto, (data) => {
         if (isMounted) {
           setCandles(data);
+          setError(null);
         }
       })
       .catch(() => {

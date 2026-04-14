@@ -11,7 +11,6 @@ import {
   TradeResponse,
   UserOverview
 } from "../types/trading";
-import { generateCandles } from "../utils/format";
 
 const ACCESS_TOKEN_KEY = "btc.accessToken";
 const REFRESH_TOKEN_KEY = "btc.refreshToken";
@@ -74,7 +73,7 @@ interface TradingState {
 export const useTradingStore = create<TradingState>((set, get) => ({
   exchange: "binance",
   selectedCrypto: "BTC",
-  candles: generateCandles(500),
+  candles: [],
   overlay: null,
   accessToken: readStoredAccessToken(),
   refreshToken: readStoredRefreshToken(),

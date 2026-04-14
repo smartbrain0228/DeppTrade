@@ -29,6 +29,7 @@ const Chart = () => {
   const priceLinesRef = useRef<IPriceLine[]>([]);
   const candles = useTradingStore((state) => state.candles);
   const overlay = useTradingStore((state) => state.overlay);
+  const hasCandles = candles.length > 0;
 
   useEffect(() => {
     if (!containerRef.current || chartRef.current) {
@@ -144,7 +145,11 @@ const Chart = () => {
     });
   }, [overlay]);
 
-  return <div className="chart-host" ref={containerRef} />;
+  return (
+    <div className="chart-host" ref={containerRef}>
+      {!hasCandles && <div className="chart-empty-state">Flux marche indisponible</div>}
+    </div>
+  );
 };
 
 export default Chart;
