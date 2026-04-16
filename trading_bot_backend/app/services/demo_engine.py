@@ -66,6 +66,9 @@ async def run_demo_engine():
                 assignments = result.scalars().all()
 
                 for assignment in assignments:
+                    if assignment.is_paused:
+                        continue
+
                     if assignment.trade_count >= 50:
                         if not assignment.is_paused:
                             assignment.is_paused = True
@@ -92,21 +95,21 @@ async def run_demo_engine():
 
                     try:
                         spot_htf = fetch_candles(
-                            exchange="binance",
+                            exchange=assignment.symbol.exchange,
                             symbol=assignment.symbol.symbol,
                             timeframe=assignment.strategy.htf,
                             limit=100,
                             is_futures=False,
                         )
                         futures_htf = fetch_candles(
-                            exchange="binance",
+                            exchange=assignment.symbol.exchange,
                             symbol=assignment.symbol.symbol,
                             timeframe=assignment.strategy.htf,
                             limit=100,
                             is_futures=True,
                         )
                         futures_ltf = fetch_candles(
-                            exchange="binance",
+                            exchange=assignment.symbol.exchange,
                             symbol=assignment.symbol.symbol,
                             timeframe=assignment.strategy.ltf,
                             limit=200,
@@ -121,13 +124,16 @@ async def run_demo_engine():
                         )
                         analysis["assignment"] = _build_assignment_payload(assignment)
 
+                        # Persist every automated scan so the UI reflects bot activity
+                        # even when the setup is not executable yet.
+                        await create_signal_event(
+                            db,
+                            analysis=analysis,
+                            trigger=SignalTriggerEnum.SCAN,
+                            trade=None,
+                        )
+
                         if analysis.get("has_divergence"):
-                            await create_signal_event(
-                                db,
-                                analysis=analysis,
-                                trigger=SignalTriggerEnum.SCAN,
-                                trade=None,
-                            )
                             skipped_trade = Trade(
                                 user_id=assignment.user_id,
                                 symbol_id=assignment.symbol_id,
