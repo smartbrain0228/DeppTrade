@@ -26,6 +26,7 @@ from trading_bot_backend.app.services.telegram_templates import (
 from trading_bot_backend.app.services.trade_execution import create_trade
 
 logger = logging.getLogger(__name__)
+_demo_engine_task: asyncio.Task | None = None
 
 
 def _build_assignment_payload(assignment: UserPairStrategy) -> dict:
@@ -237,5 +238,15 @@ async def run_demo_engine():
             await asyncio.sleep(60)
 
 
-def start_demo_engine():
-    asyncio.create_task(run_demo_engine())
+def is_demo_engine_running() -> bool:
+    return _demo_engine_task is not None and not _demo_engine_task.done()
+
+
+def start_demo_engine() -> bool:
+    global _demo_engine_task
+
+    if is_demo_engine_running():
+        return False
+
+    _demo_engine_task = asyncio.create_task(run_demo_engine(), name="demo-engine")
+    return True

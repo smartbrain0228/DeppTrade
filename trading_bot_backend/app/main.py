@@ -21,6 +21,7 @@ from trading_bot_backend.app.admin import setup_admin
 from trading_bot_backend.app.config import settings
 from trading_bot_backend.app.db import AsyncSessionLocal, init_db
 from trading_bot_backend.app.models import RoleEnum, User
+from trading_bot_backend.app.runtime import wake_background_services
 from trading_bot_backend.app.routes.admin_config import router as admin_config_router
 from trading_bot_backend.app.routes.auth import router as auth_router
 from trading_bot_backend.app.routes.market import router as market_router
@@ -30,8 +31,6 @@ from trading_bot_backend.app.routes.trades import router as trades_router
 from trading_bot_backend.app.routes.backtest import router as backtest_router
 from trading_bot_backend.app.services.binance import router as binance_router
 from trading_bot_backend.app.websocket import router as websocket_router
-from trading_bot_backend.app.worker import start_worker
-from trading_bot_backend.app.services.demo_engine import start_demo_engine
 from trading_bot_backend.app.users.deps import hash_password
 from sqlalchemy import select
 
@@ -76,15 +75,21 @@ async def startup_event():
         await bootstrap_admin_user()
         logger.info("Admin bootstrap completed on startup")
 
+    runtime = wake_background_services()
+
     if settings.should_start_worker:
-        start_worker()
-        logger.info("Trade worker started")
+        if runtime["worker_started"]:
+            logger.info("Trade worker started")
+        else:
+            logger.info("Trade worker already running")
     else:
         logger.info("Trade worker disabled for this environment")
 
     if settings.should_start_demo_engine:
-        start_demo_engine()
-        logger.info("Demo engine started")
+        if runtime["demo_engine_started"]:
+            logger.info("Demo engine started")
+        else:
+            logger.info("Demo engine already running")
     else:
         logger.info("Demo engine disabled for this environment")
 

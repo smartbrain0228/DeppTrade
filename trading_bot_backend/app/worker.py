@@ -14,6 +14,7 @@ from trading_bot_backend.app.services.notifications import send_telegram_message
 from trading_bot_backend.app.services.telegram_templates import get_daily_summary_template
 
 logger = logging.getLogger(__name__)
+_worker_task: asyncio.Task | None = None
 
 async def monitor_trades_loop():
     """
@@ -130,5 +131,16 @@ async def send_daily_summary(target_date):
     except Exception as e:
         logger.error(f"Failed to send daily summary: {e}")
 
-def start_worker():
-    asyncio.create_task(monitor_trades_loop())
+
+def is_worker_running() -> bool:
+    return _worker_task is not None and not _worker_task.done()
+
+
+def start_worker() -> bool:
+    global _worker_task
+
+    if is_worker_running():
+        return False
+
+    _worker_task = asyncio.create_task(monitor_trades_loop(), name="trade-monitor-worker")
+    return True

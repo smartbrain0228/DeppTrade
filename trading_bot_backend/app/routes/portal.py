@@ -13,6 +13,7 @@ from trading_bot_backend.app.models import (
     UserPairStrategy,
 )
 from trading_bot_backend.app.config import settings
+from trading_bot_backend.app.runtime import wake_background_services
 from trading_bot_backend.app.users.deps import get_current_user
 
 router = APIRouter(prefix="/me", tags=["portal"])
@@ -173,3 +174,12 @@ async def get_my_pair_strategies(
         }
         for row in rows
     ]
+
+
+@router.post("/wake-up")
+async def wake_up_bot(current_user=Depends(get_current_user)):
+    return {
+        "ok": True,
+        "user_id": current_user.id,
+        "runtime": wake_background_services(),
+    }

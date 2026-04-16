@@ -132,6 +132,34 @@ export const fetchMyOverview = async (token: string, signal?: AbortSignal): Prom
   return response.json();
 };
 
+export const wakeUpBot = async (
+  token: string,
+  signal?: AbortSignal
+): Promise<{
+  ok: boolean;
+  user_id: number;
+  runtime: {
+    worker_enabled: boolean;
+    worker_running: boolean;
+    worker_started: boolean;
+    demo_engine_enabled: boolean;
+    demo_engine_running: boolean;
+    demo_engine_started: boolean;
+  };
+}> => {
+  const response = await fetch(`${API_BASE_URL}/me/wake-up`, {
+    method: "POST",
+    signal,
+    headers: buildAuthHeaders(token)
+  });
+
+  if (!response.ok) {
+    return parseApiError(response, "Impossible de relancer le bot.");
+  }
+
+  return response.json();
+};
+
 export const fetchMyPairStrategies = async (
   token: string,
   signal?: AbortSignal

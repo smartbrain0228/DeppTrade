@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchMe, login } from "../../services/api";
+import { fetchMe, login, wakeUpBot } from "../../services/api";
 import { useTradingStore } from "../../store/useTradingStore";
 import { RefreshOptions, getErrorMessage } from "./shared";
 
@@ -49,6 +49,7 @@ export const useTradingDashboardSession = ({
           },
           user
         );
+        await wakeUpBot(accessToken, controller.signal);
         onAuthSuccess();
         clearAuthError();
         await refreshUserData({
@@ -87,6 +88,7 @@ export const useTradingDashboardSession = ({
       const tokens = await login(username, password);
       const user = await fetchMe(tokens.access_token);
       setSession(tokens, user);
+      await wakeUpBot(tokens.access_token);
       onAuthSuccess();
       await refreshUserData({
         includeAssignments: true,
