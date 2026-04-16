@@ -42,6 +42,11 @@ const persistTokens = (tokens: AuthTokens | null) => {
   window.localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refresh_token);
 };
 
+const isPreferredBtcAssignment = (assignment: PairStrategyAssignment) => {
+  const normalizedSymbol = assignment.symbol.trim().toUpperCase();
+  return normalizedSymbol === "BTC/USDT" || normalizedSymbol === "BTCUSDT";
+};
+
 interface TradingState {
   exchange: ExchangeId;
   selectedCrypto: CryptoSymbol;
@@ -116,7 +121,9 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     const activeAssignments = assignments.filter((item) => item.is_active);
     const nextAssignments = activeAssignments.length > 0 ? activeAssignments : assignments;
     const currentSelectedId = get().selectedAssignmentId;
-    const fallbackAssignment = nextAssignments[0] ?? null;
+    const preferredBtcAssignment =
+      nextAssignments.find((item) => isPreferredBtcAssignment(item)) ?? null;
+    const fallbackAssignment = preferredBtcAssignment ?? nextAssignments[0] ?? null;
     const selectedAssignment = nextAssignments.find((item) => item.id === currentSelectedId) ?? fallbackAssignment;
 
     set({
